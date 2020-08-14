@@ -103,7 +103,7 @@ Eureka中有Region和Zone的概念，一个Region可以包含多个Zone，每个
     │   │               └── controller
     │   │                   └── HomeController.java : 测试Controller层代码；
     │   └── resources
-    └───────── application.properties  : 配置文件
+    └───────── application.properties  : 配置文件。
 ```
 - consumer：
 ```shell script
@@ -117,10 +117,12 @@ Eureka中有Region和Zone的概念，一个Region可以包含多个Zone，每个
     │   │               ├── ConsumerApplication.java : 启动类，需要添加两个配置注释：@EnableEurekaClient @EnableFeignClients 分别是开启EurekaClient和FeignClient
     │   │               ├── controller
     │   │               │   └── HomeController.java : 测试Controller层代码；
+    │   │               ├── config
+    │   │               │   └── MineFeignConfig : 可以配置一些自定义的配置属性，然后在remote客户端引入；
     │   │               ├── hystrix
-    │   │               │   └── HomeRemoterHystrix.java : 降级熔断实现，需要在配置文件声明开启 Hystrix。
+    │   │               │   └── HomeRemoterHystrix.java : 降级熔断实现，需要在配置文件声明开启 Hystrix；
     │   │               └── remote
-    │   │                   └── HomeRemoter.java  ： 远程连接producer的连接器，详解见代码。
+    │   │                   └── HomeRemoter.java  ： 远程连接producer的连接器，详解见代码；
     │   └── resources
-    └───────── application.properties  : 配置文件
+    └───────── application.properties  : 配置文件。
 ```
