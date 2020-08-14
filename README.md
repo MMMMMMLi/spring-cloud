@@ -4,3 +4,4 @@
 
 - [ [spring-actuator](https://github.com/MMMMMMLi/spring-cloud/tree/master/spring-actuator) ]：Actuator相关使用代码；
 - [ [spring-cloud-eureka](https://github.com/MMMMMMLi/spring-cloud/tree/master/spring-cloud-eureka) ]：Eureka-Server相关使用代码；
+- [ [spring-cloud-feign](https://github.com/MMMMMMLi/spring-cloud/tree/master/spring-cloud-feign) ]：Feign 相关使用代码；
