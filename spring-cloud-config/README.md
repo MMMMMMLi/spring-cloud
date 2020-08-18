@@ -5,10 +5,10 @@
 ---
 当前项目内主要有两个版本：
 ```shell script
-ha：整合了Eureka搭建的高可用版本；
+eureka：整合了Eureka搭建的高可用版本；
 single：单机测试版本。
 
-一般项目使用的话就是使用 HA 版。
+一般项目使用的话就是使用 eureka 版。
 ```
 ---
 
@@ -26,6 +26,8 @@ Spring Cloud Config也提供本地存储配置的方式。
 
 虽然Spring Cloud Config提供了这样的功能，但是为了支持更好的管理内容和版本控制的功能，还是推荐使用git的方式。
 
+## 获取配置文件的格式样板
+
 ```shell script
 /{application}/{profile}[/{label}]
 /{application}-{profile}.yml
@@ -34,16 +36,25 @@ Spring Cloud Config也提供本地存储配置的方式。
 /{label}/{application}-{profile}.properties
 ```
 
+## 动态配置git环境
+
+在实际的应用场景中，不可能每一个微服务都有一个单独的config-server来支持，所以需要配置config-server来适配所有的微服务获取配置；
+
+具体的配置要求如下：
+
+> 在client端编写配置文件{bootstrap.properties}的时候,里面几个配置项的属性：
+>
 ```shell script
-# --------------
-# 此处动态获取配置文件的几个必须点是:
-# 1. 在client端编写配置文件{bootstrap.properties}的时候,里面几个配置项的属性.
-#       spring.cloud.config.name,这个的属性,就对应代码仓库里面的具体的某个url,即下面{application}对应的;
-# 2. 所有的配置文件命名必须以:application-{profile}.properties命名,这样在查找配置文件的时候就会根据{profile}找到.
+1. 在{bootstarp.properties}文件下配置{spring.cloud.config.name}和{spring.cloud.config.profile}属性
+2. git仓库的地址为:{spring.cloud.config.server.git.uri}里面的那个application属性替换为{spring.cloud.config.name}
+3. 创建配置文件：application-{spring.cloud.config.profile}.properties/yml
+```
+- Server端的配置文件
+```shell script
 spring.cloud.config.server.git.uri=https://github.com/MMMMMMLi/{application}
 # 这个配置项的使用场景：一套{spring-cloud-config}的服务，可以适配所有的微服务项目。
 #
-# 使用这个配置项，在项目启动的时候，会抛出错误信息，因为它在启动的时候，需要检测连接状态，并且默认的{application}为 app
+# 使用上述这个配置项，在项目启动的时候，会抛出错误信息，因为它在启动的时候，需要检测连接状态，并且默认的{application}为 app
 # 解决方案：
 # 1. 在代码仓库下命名一个 app 的仓库目录；
 # 2. 配置一个已存在的仓库来进行连通检测，如下所示，它实现了通过连接check-repo-config仓库进行健康检测
