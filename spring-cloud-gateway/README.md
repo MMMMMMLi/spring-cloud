@@ -54,3 +54,34 @@ Gateway基于Spring 5、Spring boot 2和Reactor构建，使用Netty作为运行�
 - Route（路由）：这是网关的基本构建块。它由一个 ID，一个目标 URI，一组断言和一组过滤器定义。如果断言为真，则路由匹配。
 - Predicate（断言）：这是一个 [Java 8 的 Predicate](https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html)。输入类型是一个 `ServerWebExchange` 。我们可以使用它来匹配来自 HTTP 请求的任何内容，例如 headers 或参数。
 - Filter（过滤器）：这是`org.springframework.cloud.gateway.filter.GatewayFilter` 的实例，我们可以使用它修改请求和响应。
+
+### Route
+
+Gateway配置路由的方式很简单，就是在配置文件中，声明一下配置参数即可。
+
+简单版如下：
+
+```shell script
+# 是否与服务注册于发现组件进行结合，通过 serviceId 转发到具体的服务实例
+spring.cloud.gateway.discovery.locator.enabled=true
+# 配置一下自定义路由规则
+spring.cloud.gateway.routes[0].id=producerRoutes
+# 格式为：lb://应用注册服务名
+spring.cloud.gateway.routes[0].uri=lb://gateway-producer
+# 级别越小约先执行
+spring.cloud.gateway.routes[0].order=0
+# 这个是配置路由规则的
+spring.cloud.gateway.routes[0].predicates[0]=Path=/producer/**
+```
+
+也可以通过代码来配置，具体代码见启动类第一个注释`// Simple`
+
+### Filter
+
+当使用微服务构建整个 API 服务时，一般有许多不同的应用在运行，这些服务都需要对客户端的请求的进行验证。
+
+一般有两种方法：
+1. 为每个微服务应用都实现一套用于校验的过滤器或拦截器。
+2. 通过前置的网关服务来完成这些非业务性质的校验。
+
+一般使用第二种，即编写自定义的过滤器来实现，自定义过滤器需要实现`GatewayFilter`和`Ordered`，详见代码。
