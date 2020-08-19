@@ -147,3 +147,46 @@ Gateway配置文件中配置的Filter主要是来自以下包：
 
           
 ## Spring Cloud Gateway Configuration 
+
+这里将已经配置过的gateway的配置项做一个总结整理：
+
+```properties
+# 是否与服务注册于发现组件进行结合，通过 serviceId 转发到具体的服务实例
+spring.cloud.gateway.discovery.locator.enabled=true
+# 配置一下自定义路由规则
+spring.cloud.gateway.routes[0].id=producerRoutes
+# 格式为：lb://应用注册服务名
+spring.cloud.gateway.routes[0].uri=lb://gateway-producer
+# 级别越小约先执行
+spring.cloud.gateway.routes[0].order=0
+# 这个是配置路由规则的
+spring.cloud.gateway.routes[0].predicates[0]=Path=/producer/**
+
+# 简单版的路由跳转的话，就一直服用routes[*] 即可，不同的请求转发到不同服务当中即可
+# 下面就是一些负责的配置，过滤器啊，熔断器啊，重试机制等等操作 
+
+# 这是过滤器
+spring.cloud.gateway.routes[0].filters[0]=StripPrefix=1
+spring.cloud.gateway.routes[0].filters[1]=PrefixPath=/producer
+spring.cloud.gateway.routes[0].filters[2]=AddResponseHeader=X-Response-Default-Foo, Default-Bar
+spring.cloud.gateway.routes[0].filters[3]=AddRequestParameter=token, mengli
+# 熔断降级
+spring.cloud.gateway.routes[0].filters[4].name=Hystrix
+spring.cloud.gateway.routes[0].filters[4].args.name=fallbackcmd
+spring.cloud.gateway.routes[0].filters[4].args.fallbackUri=forward:/fallback
+# 配置熔断超时时间
+#hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=6000
+hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds=8000
+# 重试
+spring.cloud.gateway.routes[0].filters[5].name=Retry
+# 重试次数，默认值是 3 次
+spring.cloud.gateway.routes[0].filters[5].args.retries=1
+# HTTP 的状态返回码，取值请参考：org.springframework.http.HttpStatus
+spring.cloud.gateway.routes[0].filters[5].args.statuses=OK
+# 指定哪些方法的请求需要进行重试逻辑，默认值是 GET 方法，取值参考：org.springframework.http.HttpMethod
+spring.cloud.gateway.routes[0].filters[5].args.methods=GET
+# 一些列的状态码配置，取值参考：org.springframework.http.HttpStatus.Series。符合的某段状态码才会进行重试逻辑，默认值是 SERVER_ERROR，值是 5，也就是 5XX(5 开头的状态码)，共有5 个值。
+spring.cloud.gateway.routes[0].filters[5].args.series=SERVER_ERROR
+# 指定哪些异常需要进行重试逻辑，默认值是java.io.IOException
+spring.cloud.gateway.routes[0].filters[5].args.exceptions=java.io.IOException
+```
