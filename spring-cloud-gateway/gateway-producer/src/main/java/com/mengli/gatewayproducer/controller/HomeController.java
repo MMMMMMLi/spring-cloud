@@ -12,4 +12,9 @@ public class HomeController {
     public String hello(@RequestParam String name) {
         return "Hello " + name + " This is Producer Service ~";
     }
+
+    @RequestMapping("/token")
+    public String hello(@RequestParam String name,@RequestParam String token) {
+        return "Hello " + name + ", You token is : " +token;
+    }
 }

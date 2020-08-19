@@ -85,3 +85,5 @@ spring.cloud.gateway.routes[0].predicates[0]=Path=/producer/**
 2. 通过前置的网关服务来完成这些非业务性质的校验。
 
 一般使用第二种，即编写自定义的过滤器来实现，自定义过滤器需要实现`GatewayFilter`和`Ordered`，详见代码。
+
+但是通过实现`GatewayFilter`实现的过滤器,仅仅是针对某一个路由来实现的,而不是全局的,如果要编写全局路由的话,需要实现`GlobalFilter`.
