@@ -86,4 +86,29 @@ spring.cloud.gateway.routes[0].predicates[0]=Path=/producer/**
 
 一般使用第二种，即编写自定义的过滤器来实现，自定义过滤器需要实现`GatewayFilter`和`Ordered`，详见代码。
 
-但是通过实现`GatewayFilter`实现的过滤器,仅仅是针对某一个路由来实现的,而不是全局的,如果要编写全局路由的话,需要实现`GlobalFilter`.
+但是通过实现`GatewayFilter`实现的过滤器，仅仅是针对某一个路由来实现的，而不是全局的，如果要编写全局路由的话，需要实现`GlobalFilter`.
+
+### 限流
+
+限流这个东西，对于高并发下的场景很关键，但是目前没有实际接触的场景，后续补充吧。
+
+一般开发高并发系统常见的限流有：限制总并发数（比如数据库连接池、线程池）、限制瞬时并发数（如 nginx 的 limit_conn 模块，用来限制瞬时并发连接数）、限制时间窗口内的平均速率（如 Guava 的 RateLimiter、nginx 的 limit_req 模块，限制每秒的平均速率）；其他还有如限制远程接口调用速率、限制 MQ 的消费速率。另外还可以根据网络连接数、网络流量、CPU 或内存负载等来限流。
+
+### 降级
+
+当下游服务出现异常宕机时，为了不影响整体系统的使用，Gateway结合Hystrix也可以实现降级熔断功能。
+
+引用`Hystrix`的Maven坐标，配置文件中配置一下过滤器。
+```shell script
+spring.cloud.gateway.routes[0].filters[4].name=Hystrix
+spring.cloud.gateway.routes[0].filters[4].args.name=fallbackcmd
+# fallback 对应的 uri，这里的 uri 仅支持 forward: schemed 的
+spring.cloud.gateway.routes[0].filters[4].args.fallbackUri=forward:/fallback
+```
+编写降级的端点`fallback`即可，详见代码。
+
+这是一个简单的配置，如果需要更强大的功能，可以参考`HystrixGatewayFilterFactory`进行自定义。
+
+`spring-cloud-gateway-core: \org\springframework\cloud\gateway\filter\factory\*`   
+          
+## Spring Cloud Gateway Configuration 
