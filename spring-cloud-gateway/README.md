@@ -109,6 +109,41 @@ spring.cloud.gateway.routes[0].filters[4].args.fallbackUri=forward:/fallback
 
 这是一个简单的配置，如果需要更强大的功能，可以参考`HystrixGatewayFilterFactory`进行自定义。
 
+### 重试
+
+在一些特殊场景下，会存在失败重试的情景，所以这个配置也可参考。
+
+```shell script
+spring.cloud.gateway.routes[0].filters[5].name=Retry
+# 重试次数，默认值是 3 次
+spring.cloud.gateway.routes[0].filters[5].args.retries=1
+# HTTP 的状态返回码，取值请参考：org.springframework.http.HttpStatus
+spring.cloud.gateway.routes[0].filters[5].args.statuses=OK
+# 指定哪些方法的请求需要进行重试逻辑，默认值是 GET 方法，取值参考：org.springframework.http.HttpMethod
+spring.cloud.gateway.routes[0].filters[5].args.methods=GET
+# 一些列的状态码配置，取值参考：org.springframework.http.HttpStatus.Series。符合的某段状态码才会进行重试逻辑，默认值是 SERVER_ERROR，值是 5，也就是 5XX(5 开头的状态码)，共有5 个值。
+spring.cloud.gateway.routes[0].filters[5].args.series=SERVER_ERROR
+# 指定哪些异常需要进行重试逻辑，默认值是java.io.IOException
+spring.cloud.gateway.routes[0].filters[5].args.exceptions=java.io.IOException
+```
+
+但是在设置重试机制之前，需要把熔断降级的超市时间调大，因为其默认是1000毫秒即1秒，这样如果设置重试次数过多，会直接调用降级方法。
+```shell script
+# 这种是设置全局的
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=6000
+# 这种是设置了针对某一种熔断器，
+hystrix.command.fallbackcmd.execution.isolation.thread.timeoutInMilliseconds=8000
+# 主要根据的是hystrix.command.{name}.execution.xxxx 配置的。
+# name指向配置的Hystrix熔断器。
+```
+
+### 更多配置项
+
+Gateway配置文件中配置的Filter主要是来自以下包：
+
 `spring-cloud-gateway-core: \org\springframework\cloud\gateway\filter\factory\*`   
+
+类名对应的是配置文件：`spring.cloud.gateway.routes[0].filters[*].name={className}`
+
           
 ## Spring Cloud Gateway Configuration 
