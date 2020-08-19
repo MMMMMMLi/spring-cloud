@@ -17,7 +17,7 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
-    @Bean
+    // @Bean
     public TokenGlobalFIlter getFilter() {
         return new TokenGlobalFIlter();
     }
